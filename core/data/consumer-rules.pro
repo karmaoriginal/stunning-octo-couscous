@@ -1,0 +1,2 @@
+-keep class app.kromiv.core.model.** { *; }
+-keep class app.kromiv.core.data.db.** { *; }
