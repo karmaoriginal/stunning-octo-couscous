@@ -18,7 +18,7 @@ class EnhanceScheduler(
 ) {
     private val workManager = WorkManager.getInstance(context)
 
-    suspend fun enqueueEnhance(wallpaperId: String, options: EnhanceOptions) = withContext(Dispatchers.IO) {
+    suspend fun enqueueEnhance(wallpaperId: String, options: EnhanceOptions): Unit = withContext(Dispatchers.IO) {
         wallpaperDao.updateEnhanceProgress(wallpaperId, EnhanceStatus.QUEUED.name, 0f)
 
         val constraints = Constraints.Builder()
@@ -47,10 +47,12 @@ class EnhanceScheduler(
             ExistingWorkPolicy.KEEP,
             request
         )
+        Unit
     }
 
-    suspend fun cancelEnhance(wallpaperId: String) = withContext(Dispatchers.IO) {
+    suspend fun cancelEnhance(wallpaperId: String): Unit = withContext(Dispatchers.IO) {
         workManager.cancelUniqueWork(VideoEnhanceWorker.uniqueWorkName(wallpaperId))
         wallpaperDao.updateEnhanceProgress(wallpaperId, EnhanceStatus.CANCELLED.name, 0f)
+        Unit
     }
 }
