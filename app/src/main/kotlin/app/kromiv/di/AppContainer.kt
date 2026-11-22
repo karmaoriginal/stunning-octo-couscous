@@ -11,6 +11,8 @@ import app.kromiv.core.media.enhance.EnhanceScheduler
 import app.kromiv.core.media.image.KromivImageLoaderFactory
 import app.kromiv.core.media.wallpaper.StaticWallpaperApplier
 import coil3.ImageLoader
+import coil3.SingletonImageLoader
+import coil3.annotation.DelicateCoilApi
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
@@ -85,10 +87,13 @@ class AppContainer(context: Context) {
         }
     }
 
+    @OptIn(DelicateCoilApi::class)
     fun rebuildImageLoader(maxCacheMb: Int) {
         synchronized(this) {
             cachedImageLoader?.let { imageLoaderFactory.clearDiskCache(it) }
-            cachedImageLoader = imageLoaderFactory.build(maxCacheMb)
+            val fresh = imageLoaderFactory.build(maxCacheMb)
+            cachedImageLoader = fresh
+            SingletonImageLoader.setUnsafe(fresh)
         }
     }
 

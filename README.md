@@ -180,4 +180,4 @@ También puedes regenerar el paquete inicial de ejemplo ejecutando `scripts/gene
 
 - Todo el contenido inicial incluido en `docs/catalog.json` y `docs/thumbs/` consiste en **arte generativo original creado específicamente para Kromiv** mediante `scripts/generate_cc0_catalog.py` y se publica bajo **CC0 1.0 Universal (Dominio Público)**.
 - Código fuente de **Kromiv** bajo **Licencia MIT** ([LICENSE](LICENSE)).
-- Librerías de terceros: `FFmpegKit` community fork (`dev.ffmpegkit-maintained:ffmpeg-kit-video`, LGPL-3.0), AndroidX Media3 / Compose / Room / WorkManager (Apache 2.0), Coil 3 (Apache 2.0), `avif-coder-coil` (Apache 2.0 / BSD-3-Clause), OkHttp (Apache 2.0).
+- Librerías de terceros: `FFmpegKit` community fork (`dev.ffmpegkit-maintained:ffmpeg-kit-video`, LGPL-3.0), AndroidX Media3 / Compose / Room / WorkManager (Apache 2.0), Coil 3 (Apache 2.0), `avif-coder-coil` (MIT / BSD-3-Clause), OkHttp (Apache 2.0).

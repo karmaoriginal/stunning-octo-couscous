@@ -82,32 +82,41 @@ jobs:
           path: build.log
           if-no-files-found: warn
 
-      - name: Publish failure diagnostics via GitHub API
-        if: failure()
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          if [ -f build.log ]; then
-            EXCERPT=$(grep -v -E '^\s+at (org\.gradle|java\.|org\.jetbrains\.kotlin\.compilerRunner|org\.jetbrains\.kotlin\.gradle)' build.log | tail -n 140)
-          else
-            EXCERPT="build.log not found"
-          fi
-          jq -n --arg sha "${{ github.sha }}" --arg txt "$EXCERPT" '{
-            name: "kromiv-build-diagnostics",
-            head_sha: $sha,
-            status: "completed",
-            conclusion: "failure",
-            output: {
-              title: "Gradle build.log excerpt",
-              summary: "Filtered compiler/gradle errors from build.log",
-              text: ("```text\n" + $txt + "\n```")
-            }
-          }' | gh api "repos/${{ github.repository }}/check-runs" --method POST --input - || true
-
       - name: Inspect APK sizes
         if: success()
         run: |
           ls -lh app/build/outputs/apk/release/ || true
+
+      - name: Publish build diagnostics via GitHub API
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "${{ job.status }}" = "success" ]; then
+            APK_LIST=$(ls -lh app/build/outputs/apk/release/*.apk 2>/dev/null || echo "No APKs found")
+            SUMMARY_TEXT=$(printf "Build & unit tests succeeded.\n\n%s" "$APK_LIST")
+            CONCL="success"
+            TITLE="Build succeeded — Release APKs & unit tests"
+          else
+            if [ -f build.log ]; then
+              SUMMARY_TEXT=$(grep -v -E '^\s+at (org\.gradle|java\.|org\.jetbrains\.kotlin\.compilerRunner|org\.jetbrains\.kotlin\.gradle)' build.log | tail -n 140)
+            else
+              SUMMARY_TEXT="build.log not found"
+            fi
+            CONCL="failure"
+            TITLE="Gradle build.log excerpt"
+          fi
+          jq -n --arg sha "${{ github.sha }}" --arg txt "$SUMMARY_TEXT" --arg concl "$CONCL" --arg title "$TITLE" '{
+            name: "kromiv-build-diagnostics",
+            head_sha: $sha,
+            status: "completed",
+            conclusion: $concl,
+            output: {
+              title: $title,
+              summary: $title,
+              text: ("```text\n" + $txt + "\n```")
+            }
+          }' | gh api "repos/${{ github.repository }}/check-runs" --method POST --input - || true
 
       - name: Upload Release APKs
         if: success()

@@ -19,9 +19,11 @@
 -keep class com.arthenica.ffmpegkit.** { *; }
 -dontwarn com.arthenica.ffmpegkit.**
 
-# AVIF/HEIF Coil Decoder
+# AVIF/HEIF Coil Decoder (avif-coder + avif-coder-coil)
 -keep class com.github.awxkee.** { *; }
+-keep class com.radzivon.bartoshyk.** { *; }
 -dontwarn com.github.awxkee.**
+-dontwarn com.radzivon.bartoshyk.**
 
 # Media3 ExoPlayer
 -keep class androidx.media3.** { *; }
