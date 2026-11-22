@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kromiv · Catálogo Oficial CC0</title>
+  <style>
+    :root { color-scheme: dark; --bg: #000000; --card: #0e111a; --accent: #7c6cf6; --text: #f3f4f8; --muted: #98a2b3; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); padding: 24px; }
+    header { max-width: 1120px; margin: 0 auto 24px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
+    h1 { margin: 0; font-size: 1.8rem; letter-spacing: -0.02em; }
+    .badge { display: inline-block; padding: 6px 12px; border-radius: 999px; background: rgba(124,108,246,0.16); color: #c4b5fd; font-size: 0.85rem; text-decoration: none; }
+    .grid { max-width: 1120px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 16px; }
+    .card { background: var(--card); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; overflow: hidden; display: flex; flex-direction: column; }
+    .card img { width: 100%; aspect-ratio: 9 / 16; object-fit: cover; display: block; background: #141824; }
+    .meta { padding: 12px; font-size: 0.88rem; }
+    .title { font-weight: 600; margin-bottom: 4px; }
+    .sub { color: var(--muted); font-size: 0.78rem; }
+    a.dl { display: inline-block; margin-top: 8px; color: #38bdf8; text-decoration: none; font-size: 0.8rem; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Kromiv · Catálogo CC0 1.0</h1>
+      <p style="color: var(--muted); margin: 4px 0 0;">Fondos estáticos y animados libres de regalías publicados en GitHub Pages &amp; Releases.</p>
+    </div>
+    <a class="badge" href="./catalog.json">Ver catalog.json</a>
+  </header>
+  <main class="grid" id="grid"></main>
+  <script>
+    fetch('./catalog.json')
+      .then(r => r.json())
+      .then(data => {
+        const grid = document.getElementById('grid');
+        for (const item of data.items) {
+          const card = document.createElement('article');
+          card.className = 'card';
+          const thumbSrc = './thumbs/' + item.id + '.webp';
+          const typeLabel = item.mediaType === 'video' ? 'LIVE MP4' : item.format.toUpperCase();
+          card.innerHTML = `
+            <img src="${thumbSrc}" alt="${item.title}" loading="lazy" />
+            <div class="meta">
+              <div class="title">${item.title}</div>
+              <div class="sub">${item.category} · ${typeLabel} · ${item.license}</div>
+              <a class="dl" href="${item.downloadUrl}" target="_blank" rel="noopener">Descargar (${(item.fileSizeBytes / 1024).toFixed(0)} KB)</a>
+            </div>
+          `;
+          grid.appendChild(card);
+        }
+      });
+  </script>
+</body>
+</html>
