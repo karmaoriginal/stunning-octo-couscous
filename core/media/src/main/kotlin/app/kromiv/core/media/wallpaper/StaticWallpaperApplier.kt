@@ -69,6 +69,7 @@ class StaticWallpaperApplier(
                 }
                 decodedBitmap.recycle()
             }
+            Unit
         }
     }
 
