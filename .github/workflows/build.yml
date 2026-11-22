@@ -14,6 +14,7 @@ on:
 
 permissions:
   contents: write
+  checks: write
 
 jobs:
   build:
@@ -80,6 +81,28 @@ jobs:
           name: build-log
           path: build.log
           if-no-files-found: warn
+
+      - name: Publish failure diagnostics via GitHub API
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -f build.log ]; then
+            EXCERPT=$(tail -n 140 build.log)
+          else
+            EXCERPT="build.log not found"
+          fi
+          jq -n --arg sha "${{ github.sha }}" --arg txt "$EXCERPT" '{
+            name: "kromiv-build-diagnostics",
+            head_sha: $sha,
+            status: "completed",
+            conclusion: "failure",
+            output: {
+              title: "Gradle build.log excerpt",
+              summary: "Last 140 lines of build.log",
+              text: ("```text\n" + $txt + "\n```")
+            }
+          }' | gh api "repos/${{ github.repository }}/check-runs" --method POST --input - || true
 
       - name: Inspect APK sizes
         if: success()
