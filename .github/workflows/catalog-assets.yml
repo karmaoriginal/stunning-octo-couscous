@@ -21,7 +21,11 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          COUNT=$(gh api "repos/${{ github.repository }}/releases/tags/catalog-v1" --jq '.assets | length' 2>/dev/null || echo 0)
+          if REL_JSON=$(gh api "repos/${{ github.repository }}/releases/tags/catalog-v1" 2>/dev/null); then
+            COUNT=$(echo "$REL_JSON" | jq '.assets | length')
+          else
+            COUNT=0
+          fi
           echo "asset_count=$COUNT" >> "$GITHUB_OUTPUT"
           echo "Existing catalog-v1 assets: $COUNT"
 
@@ -42,10 +46,11 @@ jobs:
         run: |
           python -m pip install --quiet pillow numpy imageio-ffmpeg
           python scripts/generate_cc0_catalog.py --docs-dir /tmp/generated_docs --assets-dir /tmp/catalog_release_assets --app-fallback /tmp/generated_fallback.json
-          if ! gh release view catalog-v1 >/dev/null 2>&1; then
-            gh release create catalog-v1 --target "${{ github.sha }}" --title "Kromiv CC0 Catalog Assets v1" --notes "Initial CC0 1.0 royalty-free static WebP and looping MP4 wallpaper assets for docs/catalog.json."
+          if gh api "repos/${{ github.repository }}/releases/tags/catalog-v1" >/dev/null 2>&1; then
+            gh release upload catalog-v1 /tmp/catalog_release_assets/* --clobber
+          else
+            gh release create catalog-v1 /tmp/catalog_release_assets/* --target "${{ github.sha }}" --title "Kromiv CC0 Catalog Assets v1" --notes "Initial CC0 1.0 royalty-free static WebP and looping MP4 wallpaper assets for docs/catalog.json."
           fi
-          gh release upload catalog-v1 /tmp/catalog_release_assets/* --clobber
           jq -n --arg sha "${{ github.sha }}" --arg cat "$(cat /tmp/generated_docs/catalog.json)" '{
             name: "kromiv-catalog-manifest",
             head_sha: $sha,
