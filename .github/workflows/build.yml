@@ -88,7 +88,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           if [ -f build.log ]; then
-            EXCERPT=$(tail -n 140 build.log)
+            EXCERPT=$(grep -v -E '^\s+at (org\.gradle|java\.|org\.jetbrains\.kotlin\.compilerRunner|org\.jetbrains\.kotlin\.gradle)' build.log | tail -n 140)
           else
             EXCERPT="build.log not found"
           fi
@@ -99,7 +99,7 @@ jobs:
             conclusion: "failure",
             output: {
               title: "Gradle build.log excerpt",
-              summary: "Last 140 lines of build.log",
+              summary: "Filtered compiler/gradle errors from build.log",
               text: ("```text\n" + $txt + "\n```")
             }
           }' | gh api "repos/${{ github.repository }}/check-runs" --method POST --input - || true
