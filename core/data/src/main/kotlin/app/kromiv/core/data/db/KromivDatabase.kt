@@ -84,4 +84,19 @@ interface FavoriteDao {
 abstract class KromivDatabase : RoomDatabase() {
     abstract fun wallpaperDao(): WallpaperDao
     abstract fun favoriteDao(): FavoriteDao
+
+    companion object {
+        @Volatile
+        private var instance: KromivDatabase? = null
+
+        fun getInstance(context: android.content.Context): KromivDatabase {
+            return instance ?: synchronized(this) {
+                instance ?: androidx.room.Room.databaseBuilder(
+                    context.applicationContext,
+                    KromivDatabase::class.java,
+                    "kromiv.db"
+                ).build().also { instance = it }
+            }
+        }
+    }
 }

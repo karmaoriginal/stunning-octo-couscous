@@ -1,0 +1,5 @@
+-keep class com.arthenica.ffmpegkit.** { *; }
+-dontwarn com.arthenica.ffmpegkit.**
+-keep class com.github.awxkee.** { *; }
+-keep class androidx.media3.** { *; }
+-keep class app.kromiv.core.media.** { *; }

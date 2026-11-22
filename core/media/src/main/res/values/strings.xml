@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="live_wallpaper_label">Kromiv Live Wallpaper</string>
+    <string name="live_wallpaper_description">Motor animado de fondos en ultra fluidez y bajo consumo de batería</string>
+    <string name="enhance_channel_name">Mejora de video</string>
+    <string name="enhance_channel_desc">Progreso de transcodificación y mejora de fondos de video</string>
+</resources>
